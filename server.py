@@ -10,12 +10,70 @@ from perspective import Table, PerspectiveManager, PerspectiveTornadoHandler
 import requests
 import pandas as pd
 import io
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError
+import sys
+from catchException import exception_handler
+
+
+
+## handle exception properly
+## make it summarised info , hide traceback
+sys.excepthook = exception_handler
+#####
 
 # Add token before running swerver
-token=''
+### we can parse this to yaml file
+token = ""
 api='https://endapi.truefeedback.io/dataplatform/survey/1/answers?limit=40000&offset=0'
-a=requests.get(api,headers={"auth": token}).content
-df=pd.read_json(a)
+
+
+
+###########################################################################
+#### update in case of connection problem or 
+### server is down
+## create a session
+try:
+    s = requests.Session()
+    ##
+
+    ## configure session retry
+    retries = Retry(total=5,
+                    backoff_factor=0.1,
+                    status_forcelist=[ 500, 502, 503, 504 ]) ## force status retry if code returned is 500, 502, 504
+    ##
+
+
+    ### mount an adapter
+    s.mount('http://', HTTPAdapter(max_retries=retries))
+    ##
+
+    ### establish a get on the api
+    getApi = s.get(api, headers={"auth": token} )
+    ##
+
+    ## the content retry
+    ##a=requests.get(api,headers={"auth": token}).content
+    a = getApi.content 
+    df=pd.read_json(a)
+except  (ConnectTimeout, HTTPError, ReadTimeout, Timeout, ConnectionError) as e:
+    raise Exception('There is an http connection problem. Check the connection error', str(e))
+except ValueError as e:
+    raise ValueError('Data not in json format.', str(e))
+except:
+    raise Exception('a problem has occurred with connection/connection parameters or data format')
+    #sys.exit()
+
+##########################################################################
+
+###################### previous connection configuration ###############33
+# a=requests.get(api,headers={"auth": token}).content
+# df=pd.read_json(a)
+###############################################################
+
+
+
 
 def data_source():
     rows = []
