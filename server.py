@@ -17,7 +17,8 @@ import requests
 
 ### data token
 token = ""
-### requestion that can be reused for the answer or survey api type
+### session that can be reused for the answer or survey api type
+## this line will need to be updated to take in surveys and answers
 s = requests.Session()
 #api = 'https://endapi.truefeedback.io/dataplatform/survey/1/answers?limit=40000&offset=0'
 
