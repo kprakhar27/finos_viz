@@ -5,7 +5,7 @@ from datetime import date, datetime
 import requests
 import pandas as pd
 import io
-token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVkZW50aWFscyI6InByaXZhdGUtZGF0YS1wbGF0Zm9ybS1rZXkgZm9yIGFscGhhIiwiY3JlYXRlZEF0IjoiMjAyMS0wNi0yOFQxODoxNjoyOC4yNThaIiwiaWF0IjoxNjI0OTA0MTg4fQ.ITcG3EO90Uzc9JZYjE6g5mbmh4kkHBDO6QEumQ8ZruQ'
+token=''
 api='https://endapi.truefeedback.io/dataplatform/survey/1/answers?limit=40000&offset=0'
 a=requests.get(api,headers={"auth": token}).content
 df=pd.read_json(a)
