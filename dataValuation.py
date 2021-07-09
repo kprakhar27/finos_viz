@@ -21,9 +21,9 @@ sys.excepthook = exception_handler
 def collectApiData(session=None, apitype="surveys", survey_id = 1, limit=40000, offset=0, token=" " ):
     '''
     function takes 6 parameters and returns the data from the api.
-    session : request session. this can be reused for the sifferent data type
-    apitype:  the survey types. can be answers or questions. The selection determines the api to be used
-    survey_id: each survey has survey id. this gives the corresponing survey id
+    session : request session. this can be reused for the different api type
+    apitype:  the type of data to collect. can be answers or surveys. This selection determines the api to be used
+    survey_id: each survey has survey id. this is the corresponing survey id . Get the survey id from the surveys api
     limit: the limit of the data to be collected
     offset: the offset where to start next data collection from
     token: the token to be used in the api call
