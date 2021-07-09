@@ -15,14 +15,7 @@ import urllib3
 sys.excepthook = exception_handler
 #####
 
-# Add token before running swerver
-### we can parse this to yaml file
-#token = ""
-#apiAnswers= "answers"
-#'https://endapi.truefeedback.io/dataplatform/survey/1/answers?limit=40000&offset=0'
 
-#apiSurveys= "surveys"
-# "https://endapi.truefeedback.io/dataplatform/survey/"
 
 
 def collectApiData(session=None, apitype="surveys", survey_id = 1, limit=40000, offset=0, token=" " ):
