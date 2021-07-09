@@ -7,73 +7,25 @@ import tornado.ioloop
 from datetime import date, datetime
 from perspective import Table, PerspectiveManager, PerspectiveTornadoHandler
 
-import requests
 import pandas as pd
 import io
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError
-import sys
-from catchException import exception_handler
+from dataValuation import collectApiData
+import requests
 
 
 
-## handle exception properly
-## make it summarised info , hide traceback
-sys.excepthook = exception_handler
-#####
 
-# Add token before running swerver
-### we can parse this to yaml file
-token = ""
-api='https://endapi.truefeedback.io/dataplatform/survey/1/answers?limit=40000&offset=0'
+### data token
+token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVkZW50aWFscyI6InByaXZhdGUtZGF0YS1wbGF0Zm9ybS1rZXkgZm9yIGFscGhhIiwiY3JlYXRlZEF0IjoiMjAyMS0wNi0yOFQxODoxNjoyOC4yNThaIiwiaWF0IjoxNjI0OTA0MTg4fQ.ITcG3EO90Uzc9JZYjE6g5mbmh4kkHBDO6QEumQ8ZruQ"
+### requestion that can be reused for the answer or survey api type
+s = requests.Session()
+#api = 'https://endapi.truefeedback.io/dataplatform/survey/1/answers?limit=40000&offset=0'
 
+df = collectApiData(session=s, apitype="answers",token=token )
 
-
-###########################################################################
-#### update in case of connection problem or 
-### server is down
-## create a session
-try:
-    s = requests.Session()
-    ##
-
-    ## configure session retry
-    retries = Retry(total=5,
-                    backoff_factor=0.1,
-                    status_forcelist=[ 500, 502, 503, 504 ]) ## force status retry if code returned is 500, 502, 504
-    ##
-
-
-    ### mount an adapter
-    s.mount('http://', HTTPAdapter(max_retries=retries))
-    ##
-
-    ### establish a get on the api
-    getApi = s.get(api, headers={"auth": token} )
-    ##
-
-    ## the content retry
-    ##a=requests.get(api,headers={"auth": token}).content
-    a = getApi.content 
-    df=pd.read_json(a)
-except  (ConnectTimeout, HTTPError, ReadTimeout, Timeout, ConnectionError) as e:
-    raise Exception('There is an http connection problem. Check the connection error', str(e))
-except ValueError as e:
-    raise ValueError('Data not in json format.', str(e))
-except:
-    raise Exception('a problem has occurred with connection/connection parameters or data format')
-    #sys.exit()
-
-##########################################################################
-
-###################### previous connection configuration ###############33
+### initial way of getting the api
 # a=requests.get(api,headers={"auth": token}).content
 # df=pd.read_json(a)
-###############################################################
-
-
-
 
 def data_source():
     rows = []
