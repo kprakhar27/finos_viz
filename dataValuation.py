@@ -5,9 +5,9 @@ from urllib3.util.retry import Retry
 from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError
 import pandas as pd
 import os
-import requests
+# import requests
 
-import urllib3
+# import urllib3
 
 
 ## handle exception properly
@@ -18,7 +18,7 @@ sys.excepthook = exception_handler
 
 
 
-def collectApiData(session=None, apitype="surveys", survey_id = 1, limit=40000, offset=0, token=" " ):
+def collectApiData(session=None, apitype="surveys", survey_id = 1, limit=10000, offset=0, token=" " ):
     '''
     function takes 6 parameters and returns the data from the api.
     session : request session. this can be reused for the different api type
