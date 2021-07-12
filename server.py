@@ -14,18 +14,19 @@ from perspective import Table, PerspectiveManager, PerspectiveTornadoHandler
 
 from dataValuation import collectApiData
 from dataProcessing import welcome_survey
+from dataprocessing1 import mall_survey
 
 
 ### data token
-token = ""
+token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVkZW50aWFscyI6InByaXZhdGUtZGF0YS1wbGF0Zm9ybS1rZXkgZm9yIGFscGhhIiwiY3JlYXRlZEF0IjoiMjAyMS0wNi0yOFQxODoxNjoyOC4yNThaIiwiaWF0IjoxNjI0OTA0MTg4fQ.ITcG3EO90Uzc9JZYjE6g5mbmh4kkHBDO6QEumQ8ZruQ"
 
 
 ### session that can be reused for the answer or survey api type
 ## this line will need to be updated to take in surveys and answers
 s = requests.Session()
 #api = 'https://endapi.truefeedback.io/dataplatform/survey/1/answers?limit=40000&offset=0'
-
-df = collectApiData(session=s, apitype="answers",token=token )
+survey_id = 78
+df = collectApiData(session=s, apitype="answers",token=token, survey_id = survey_id )
 df1 = pd.DataFrame()
 df2 = pd.DataFrame()
 ## global variable which will increase offset after every function call
@@ -59,7 +60,10 @@ limit = 0
 
 def data_source():
     global limit
-    data = welcome_survey(limit=limit,df=df)
+    if survey_id == 1:
+        data = welcome_survey(limit=limit,df=df)
+    elif survey_id == 78:
+        data = mall_survey(limit=limit,df=df)
     limit = limit+100
 
     return data
@@ -72,30 +76,60 @@ def perspective_thread(manager):
     in the front-end."""
     psp_loop = tornado.ioloop.IOLoop()
     manager.set_loop_callback(psp_loop.add_callback)
-    table = Table(
-        {
-            "0": str,
-            "1": str,
-            "2": str,
-            "3": str,
-            "4": str,
-            "5": str,
-            "6": str,
-            # "uid": int,
-            # "q7": dict,
-            # "q8": dict,
-            # "q9": dict,
-            # "q10": str,
-        },
-    )
-
+    if survey_id == 1:
+        table = Table(
+                {
+                    "0": str,
+                    "1": str,
+                    "2": str,
+                    "3": str,
+                    "4": str,
+                    "5": str,
+                    "6": str,
+                    #"7": str,
+                    #"8": str,
+                    #"9": str,
+                    # "uid": int,
+                    # "q7": dict,
+                    # "q8": dict,
+                    # "q9": dict,
+                    # "q10": str,
+                },
+            )
+    elif survey_id == 78:
+        table= Table(
+                {
+                    "0": str,
+                    "1": str,
+                    "2": str,
+                    "3": str,
+                    "4": str,
+                    "5": str,
+                    "6": str,
+                    "7": str,
+                    "8": str,
+                    "9": str,
+                    # "uid": int,
+                    # "q7": dict,
+                    # "q8": dict,
+                    # "q9": dict,
+                    # "q10": str,
+                },
+            )
     # Track the table with the name "data_source_one", which will be used in
     # the front-end to access the Table.
-    manager.host_table("data_source_one", table)
+    if survey_id == 1:
+        manager.host_table("data_source_one", table)
+    elif survey_id == 78:
+        manager.host_table("data_source_two", table)
+
 
     # update with new data every 50ms
     def updater():
-        table.update(data_source())
+            table.update(data_source())
+
+
+    
 
     callback = tornado.ioloop.PeriodicCallback(callback=updater, callback_time=50)
     callback.start()
