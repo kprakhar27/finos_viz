@@ -13,8 +13,8 @@ import tornado.ioloop
 from perspective import Table, PerspectiveManager, PerspectiveTornadoHandler
 
 from dataValuation import collectApiData
-from dataProcessing import welcome_survey
-from dataprocessing1 import mall_survey
+from dataProcessing import welcome_survey,e_survey,match_1,match_2, mall_survey
+# from dataprocessing1 import mall_survey
 
 
 ### data token
@@ -24,16 +24,18 @@ token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVkZW50aWFscyI6InByaXZhdGUtZG
 ### session that can be reused for the answer or survey api type
 ## this line will need to be updated to take in surveys and answers
 s = requests.Session()
-#api = 'https://endapi.truefeedback.io/dataplatform/survey/1/answers?limit=40000&offset=0'
+
+# set survey id to change surveys
 survey_id = 78
+
 df = collectApiData(session=s, apitype="answers",token=token, survey_id = survey_id )
-df1 = pd.DataFrame()
-df2 = pd.DataFrame()
+# df1 = pd.DataFrame()
+# df2 = pd.DataFrame()
+
 ## global variable which will increase offset after every function call
 offset = 10000
 
 tracker = 1
-
 
 ## Multithread function to update df 
 # def update_df():
@@ -52,11 +54,7 @@ tracker = 1
 #         tracker = tracker + 1
     # pass
 
-
 limit = 0
-### initial way of getting the api
-# a=requests.get(api,headers={"auth": token}).content
-# df=pd.read_json(a)
 
 def data_source():
     global limit
@@ -64,10 +62,14 @@ def data_source():
         data = welcome_survey(limit=limit,df=df)
     elif survey_id == 78:
         data = mall_survey(limit=limit,df=df)
-    limit = limit+100
-
-    return data
+    elif survey_id == 79:
+        data = e_survey(limit= limit,df=df)
+    elif survey_id == 94:
+        data = match_2(limit= limit,df=df)
+    elif survey_id == 95:
+        data = match_1(limit= limit,df=df)
     
+    return data
 
 
 def perspective_thread(manager):
@@ -86,15 +88,8 @@ def perspective_thread(manager):
                     "4": str,
                     "5": str,
                     "6": str,
-                    #"7": str,
-                    #"8": str,
-                    #"9": str,
-                    # "uid": int,
-                    # "q7": dict,
-                    # "q8": dict,
-                    # "q9": dict,
-                    # "q10": str,
                 },
+                limit = len[df]
             )
     elif survey_id == 78:
         table= Table(
@@ -109,30 +104,59 @@ def perspective_thread(manager):
                     "7": str,
                     "8": str,
                     "9": str,
-                    # "uid": int,
-                    # "q7": dict,
-                    # "q8": dict,
-                    # "q9": dict,
-                    # "q10": str,
                 },
+                limit = len(df)
             )
+    elif survey_id==79:
+        table= Table(
+                {
+                    "0": str,
+                    "1": str,
+                    "2": str,
+                    "3": str,
+                    "4": str,
+                    "5": str,
+                    "6": str,
+                    "7": str,
+                },
+                limit = len[df]
+            )
+    elif survey_id==94:
+            table= Table(
+                {
+                    "0": str,
+                    "1": str,
+                },
+                limit = len[df]
+            )
+    elif survey_id==95:
+            table= Table(
+                {
+                    "0": str,
+                    "1": str,
+                },
+                limit = len[df]
+            )
+
     # Track the table with the name "data_source_one", which will be used in
     # the front-end to access the Table.
-    if survey_id == 1:
-        manager.host_table("data_source_one", table)
-    elif survey_id == 78:
-        manager.host_table("data_source_two", table)
-
+    manager.host_table("data_source_one", table)
 
     # update with new data every 50ms
     def updater():
+        global limit
+        if limit + 100 < len(df):
             table.update(data_source())
-
-
-    
+            limit = limit+100
+        else:
+            limit = 0
+            # callback.stop()
+            table.replace(data_source())
+            
 
     callback = tornado.ioloop.PeriodicCallback(callback=updater, callback_time=50)
     callback.start()
+    
     psp_loop.start()
 
 
