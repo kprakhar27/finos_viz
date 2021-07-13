@@ -1,3 +1,5 @@
 
 *.ipynb
 *.csv
+extras.py
+.ipynb_checkpoints
