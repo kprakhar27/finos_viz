@@ -18,7 +18,7 @@ from dataProcessing import welcome_survey,e_survey,match_1,match_2, mall_survey,
 
 
 ### data token
-token = ""
+token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVkZW50aWFscyI6InByaXZhdGUtZGF0YS1wbGF0Zm9ybS1rZXkgZm9yIGFscGhhIiwiY3JlYXRlZEF0IjoiMjAyMS0wNi0yOFQxODoxNjoyOC4yNThaIiwiaWF0IjoxNjI0OTA0MTg4fQ.ITcG3EO90Uzc9JZYjE6g5mbmh4kkHBDO6QEumQ8ZruQ"
 
 
 ### session that can be reused for the answer or survey api type
@@ -26,9 +26,9 @@ token = ""
 s = requests.Session()
 
 # set survey id to change surveys
-survey_id = 78
+survey_id = 1
 
-apitype = "answers"
+apitype = "surveys"
 
 df = collectApiData(session=s, apitype=apitype,token=token, survey_id = survey_id )
 # df1 = pd.DataFrame()
@@ -62,7 +62,7 @@ def data_source():
     global limit
     global df
     if apitype =="answers":
-        df = collectApiData(session=s, apitype=apitype,token=token, survey_id = survey_id)
+        # df = collectApiData(session=s, apitype=apitype,token=token, survey_id = survey_id)
         if survey_id == 1:
             data = welcome_survey(limit=limit,df=df)
         elif survey_id == 78:
@@ -212,13 +212,14 @@ def make_app():
                 {"path": "./", "default_filename": "index.html"},
             ),
         ]
+        ,debug=True
     )
 
 
 def main():
     app = make_app()
-    app.listen(8080)
-    logging.critical("Listening on http://localhost:8080")
+    app.listen(8888)
+    logging.critical("Listening on http://0.0.0.0:8888")
     loop = tornado.ioloop.IOLoop.current()
     loop.start()
 

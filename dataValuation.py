@@ -74,7 +74,7 @@ def collectApiData(session=None, apitype="surveys", survey_id = 1, limit=40000, 
         a = getApi.content 
         ## read extracted data into pandas
         df=pd.read_json(a)
-        print("my df: ", df.head())
+        # print("my df: ", df.head())
         return df 
     ###########################################################################
 
